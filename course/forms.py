@@ -1,11 +1,13 @@
 from django import forms
 from django.contrib.humanize.templatetags.humanize import ordinal
+from django.core.exceptions import ValidationError
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 
 from aplus.api import api_reverse
 from lib.fields import UsersSearchSelectField
-from .models import Enrollment, StudentGroup
+from lib.validators import generate_url_key_validator
+from .models import Course, Enrollment, StudentGroup
 from userprofile.models import UserProfile
 
 
@@ -116,3 +118,27 @@ class EnrollStudentsForm(forms.Form):
         super().__init__(*args, **kwargs)
         self.fields['user_profiles'].widget.attrs["data-search-api-url"] = api_reverse(
             "user-list")
+
+
+class CreateCourseForm(forms.Form):
+    # Course
+    course_name = forms.CharField(label=_("Course name"),
+        widget=forms.TextInput(attrs={'placeholder': "example: Programming Course"}))
+    course_code = forms.CharField(label=_("Course code"),
+        widget=forms.TextInput(attrs={'placeholder': "example: CS-AXXXX"}))
+    course_url = forms.CharField(label=_("Course URL"),
+        validators=[generate_url_key_validator()],
+        widget=forms.TextInput(attrs={'placeholder': "example: cs-axxxx"}))
+
+    # CourseInstance
+    instance_name = forms.CharField(label=_("Initial instance name"),
+        widget=forms.TextInput(attrs={'placeholder': "example: 20XX Spring"}))
+    instance_url = forms.CharField(label=_("Initial instance URL"),
+        validators=[generate_url_key_validator()],
+        widget=forms.TextInput(attrs={'placeholder': "example: 20xx-spring"}))
+
+    def clean_course_url(self):
+        url = self.cleaned_data['course_url']
+        if Course.objects.filter(url=url).exists():
+            raise ValidationError(_("The URL is already taken."))
+        return url

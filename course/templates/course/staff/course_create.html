@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load bootstrap %}
+
+{% block content %}
+<div class="row">
+	<div class="col-sm-offset-2 col-sm-8 page-header">
+		<h1>{% trans "Create a new course" %}</h1>
+	</div>
+</div>
+<div class="row">
+	<div class="col-sm-offset-2 col-sm-8 col-lg-4">
+		<form method="post">
+			{% csrf_token %}
+			{{ form|bootstrap }}
+			<button type="submit" class="aplus-button--default aplus-button--md">
+				{% trans "Create" %}
+			</button>
+		</form>
+	</div>
+</div>
+{% endblock %}

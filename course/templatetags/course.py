@@ -24,7 +24,10 @@ def _prepare_topmenu(context):
 @register.inclusion_tag("course/_course_dropdown_menu.html", takes_context=True)
 def course_menu(context):
     menu = _prepare_topmenu(context)
-    return { "instances": menu.courses() }
+    return {
+        'instances': menu.courses(),
+        'user': context['request'].user,
+    }
 
 
 @register.inclusion_tag('course/_group_select.html', takes_context=True)

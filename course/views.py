@@ -5,6 +5,7 @@ from urllib.parse import unquote
 from django.conf import settings
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied
+from django.db import transaction
 from django.http import Http404
 from django.http.response import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404
@@ -23,7 +24,7 @@ from exercise.models import LearningObject
 from lib.helpers import settings_text, remove_query_param_from_url
 from lib.viewbase import BaseTemplateView, BaseRedirectMixin, BaseFormView, BaseView, BaseRedirectView
 from userprofile.viewbase import UserProfileView
-from .forms import GroupsForm, GroupSelectForm
+from .forms import CreateCourseForm, GroupsForm, GroupSelectForm
 from .models import Course, CourseInstance, CourseModule, Enrollment
 from .permissions import EnrollInfoVisiblePermission
 from .renders import group_info_context
@@ -327,3 +328,34 @@ class LanguageView(CourseInstanceMixin, BaseView):
                     )
                 request.REQUEST_LANG = lang_code
         return response
+
+
+class CreateCourseView(UserProfileView, BaseFormView):
+    access_mode = ACCESS.SUPERUSER
+    template_name = "course/staff/course_create.html"
+    form_class = CreateCourseForm
+
+    def form_valid(self, form):
+        course, instance = self.create_course(form)
+        messages.success(self.request, _("The course was created successfully."))
+        return self.redirect(instance.get_url('course-details'))
+
+    @transaction.atomic
+    def create_course(self, form):
+        course = Course.objects.create(
+            name=form.cleaned_data['course_name'],
+            code=form.cleaned_data['course_code'],
+            url=form.cleaned_data['course_url'],
+        )
+        course.teachers.add(self.profile)
+
+        instance = CourseInstance.objects.create(
+            course=course,
+            instance_name=form.cleaned_data['instance_name'],
+            url=form.cleaned_data['instance_url'],
+            visible_to_students=False,
+            starting_time=timezone.now().date(),
+            ending_time=timezone.now().date(),
+        )
+
+        return course, instance

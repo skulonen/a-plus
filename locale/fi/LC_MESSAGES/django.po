@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-05-26 19:21+0300\n"
+"POT-Creation-Date: 2021-06-09 16:47+0300\n"
 "PO-Revision-Date: 2019-08-14 12:16+0200\n"
 "Last-Translator: Markku Riekkinen <markku.riekkinen@aalto.fi>\n"
 "Language-Team: Finnish <>\n"
@@ -105,6 +105,30 @@ msgstr "Tämä ryhmä on jo olemassa."
 #: course/forms.py
 msgid "Users"
 msgstr "Käyttäjät"
+
+#: course/forms.py
+msgid "Course name"
+msgstr "Kurssin nimi"
+
+#: course/forms.py
+msgid "Course code"
+msgstr "Kurssikoodi"
+
+#: course/forms.py
+msgid "Course URL"
+msgstr "Kurssin URL"
+
+#: course/forms.py
+msgid "Initial instance name"
+msgstr "Ensimmäisen kurssikerran nimi"
+
+#: course/forms.py
+msgid "Initial instance URL"
+msgstr "Ensimmäisen kurssikerran URL"
+
+#: course/forms.py edit_course/course_forms.py
+msgid "The URL is already taken."
+msgstr "URL on jo käytössä."
 
 #: course/models.py
 msgid "Input an URL identifier for this course."
@@ -387,8 +411,13 @@ msgid "Hidden from students"
 msgstr "Piilotettu opiskelijoilta"
 
 #: course/templates/course/_course_dropdown_menu.html
-msgid "Begin by enrolling in a course."
-msgstr "Aloita ilmoittautumalla jollekin kurssille."
+msgid "Begin by enrolling in a course"
+msgstr "Aloita ilmoittautumalla jollekin kurssille"
+
+#: course/templates/course/_course_dropdown_menu.html
+#: course/templates/course/staff/course_create.html
+msgid "Create a new course"
+msgstr "Luo uusi kurssi"
 
 #: course/templates/course/_course_menu.html
 msgid "Skip course navigation"
@@ -772,6 +801,10 @@ msgstr "Peruuta"
 msgid "Remove all"
 msgstr "Poista kaikki"
 
+#: course/templates/course/staff/course_create.html
+msgid "Create"
+msgstr "Luo"
+
 #: course/templates/course/staff/enroll_students.html
 #: course/templates/course/staff/participants.html
 msgid "Enroll students"
@@ -924,6 +957,10 @@ msgstr "Ilmoittautuminen ei ole avoinna."
 #: course/views.py
 msgid "A new student group was created."
 msgstr "Luotiin uusi opiskelijaryhmä."
+
+#: course/views.py
+msgid "The course was created successfully."
+msgstr "Kurssi luotiin onnistuneesti."
 
 #: deviations/forms.py
 msgid ""
@@ -1095,10 +1132,6 @@ msgstr "Valikon linkit"
 #: edit_course/templates/edit_course/usertag_list.html
 msgid "Student tags"
 msgstr "Opiskelijamerkinnät"
-
-#: edit_course/course_forms.py
-msgid "The URL is already taken."
-msgstr "URL on jo käytössä."
 
 #: edit_course/course_forms.py
 msgid "Can't clone chapters and exercises without cloning exercise categories."
@@ -4058,7 +4091,6 @@ msgid "Forget automatic redirection"
 msgstr "Unohda automaattinen uudelleenohjaus"
 
 #: userprofile/templates/userprofile/profile.html
-#, python-format
 msgid "Information provided by your organization"
 msgstr "Organisaatioltasi saadut tiedot"
 
@@ -4072,10 +4104,6 @@ msgstr ""
 "Seuraavat asetukset voi muuttaa tunnistustietojen tarjoajan järjestelmässä."
 
 #: userprofile/templates/userprofile/profile.html
-msgid "Organization"
-msgstr "Organisaatio"
-
-#: userprofile/templates/userprofile/profile.html
 msgid "[Missing]"
 msgstr "[Puuttuu]"
 
@@ -4086,6 +4114,10 @@ msgstr "Opiskelijanumero"
 #: userprofile/templates/userprofile/profile.html
 msgid "E-mail"
 msgstr "Sähköposti"
+
+#: userprofile/templates/userprofile/profile.html
+msgid "Organization"
+msgstr "Organisaatio"
 
 #: userprofile/templates/userprofile/support.html
 #, python-format

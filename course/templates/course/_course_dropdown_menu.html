@@ -13,8 +13,16 @@
 	{% empty %}
 	<li role="presentation">
 		<a href="/">
-			{% trans "Begin by enrolling in a course." %}
+			{% trans "Begin by enrolling in a course" %}
 		</a>
 	</li>
 	{% endfor %}
+	{% if user.is_superuser %}
+	<li role="presentation" class="divider"></li>
+	<li role="presentation">
+		<a href="{% url 'course_create' %}">
+			{% trans "Create a new course" %}
+		</a>
+	</li>
+	{% endif %}
 </ul>
