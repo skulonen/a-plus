@@ -72,11 +72,10 @@ def build_plugin_renderers(plugins,
         #else:
         #    raise ValueError(view_name + " is not supported for plugins.")
 
-        plugins = plugins.filter(views__contains=view_name)
+        plugins = plugins.filter(views__contains=view_name).select_subclasses()
 
         renderers = []
         for p in plugins:
-            p = p.as_leaf_class()
             if hasattr(p, "get_renderer_class"):
                 renderers.append(p.get_renderer_class()(p, view_name, context))
             else:

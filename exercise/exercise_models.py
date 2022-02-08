@@ -26,7 +26,7 @@ from authorization.object_permissions import register_jwt_accessible_class
 from course.models import Enrollment, StudentGroup, CourseInstance, CourseModule, LearningObjectCategory
 from external_services.lti import CustomStudentInfoLTIRequest
 from external_services.models import LTIService
-from inheritance.models import ModelWithInheritance
+from inheritance.models import ModelWithInheritance, ModelWithInheritanceManager
 from lib.api.authentication import (
     get_graderauth_submission_params,
     get_graderauth_exercise_params,
@@ -55,14 +55,31 @@ if TYPE_CHECKING:
     from .submission_models import Submission, SubmissionDraft
 
 
-
-class LearningObjectManager(models.Manager):
-
+class LearningObjectManager(ModelWithInheritanceManager):
     def get_queryset(self):
-        return super().get_queryset()\
-            .defer('description')\
-            .select_related('course_module', 'course_module__course_instance',
-                'course_module__course_instance__course', 'category')
+        return (
+            super().get_queryset()
+            .defer('description')
+            .select_related(
+                'course_module',
+                'course_module__course_instance',
+                'course_module__course_instance__course',
+                'category',
+            )
+            .prefetch_related(
+                models.Prefetch(
+                    'parent',
+                    super().get_queryset()
+                    .defer('description')
+                    .select_related(
+                        'course_module',
+                        'course_module__course_instance',
+                        'course_module__course_instance__course',
+                    )
+                )
+            )
+            # Can't select_subclasses here -- it will break deletion at least in Django Admin, because 'objects' is base_manager_name
+        )
 
     def find_enrollment_exercise(self, course_instance, profile):
         exercise = None
@@ -70,11 +87,11 @@ class LearningObjectManager(models.Manager):
             exercise = self.filter(
                 course_module__course_instance=course_instance,
                 status='enrollment_ext'
-            ).first()
+            ).select_subclasses().first()
         return exercise or self.filter(
             course_module__course_instance=course_instance,
             status='enrollment'
-        ).first()
+        ).select_subclasses().first()
 
 
 class LearningObject(UrlMixin, ModelWithInheritance):
@@ -431,8 +448,6 @@ class CourseChapter(LearningObject):
         default=False,
     )
 
-    objects = models.Manager()
-
     class Meta:
         verbose_name = _('MODEL_NAME_COURSE_CHAPTER')
         verbose_name_plural = _('MODEL_NAME_COURSE_CHAPTER_PLURAL')
@@ -441,15 +456,8 @@ class CourseChapter(LearningObject):
         return not self.generate_table_of_contents
 
 
-class BaseExerciseManager(JWTAccessible["BaseExercise"], models.Manager['BaseExercise']):
-
-    def get_queryset(self):
-        return super().get_queryset().select_related(
-            'category',
-            'course_module',
-            'course_module__course_instance',
-            'course_module__course_instance__course',
-        )
+class BaseExerciseManager(JWTAccessible["BaseExercise"], LearningObjectManager):
+    pass
 
 
 @register_jwt_accessible_class("exercise")
@@ -1104,8 +1112,6 @@ class LTIExercise(BaseExercise):
         help_text=_('LTI_EXERCISE_OPEN_IN_IFRAME_HELPTEXT'),
     )
 
-    objects = models.Manager()
-
     class Meta:
         verbose_name = _('MODEL_NAME_LTI_EXERCISE')
         verbose_name_plural = _('MODEL_NAME_LTI_EXERCISE_PLURAL')
@@ -1230,8 +1236,6 @@ class StaticExercise(BaseExercise):
         verbose_name=_('LABEL_SUBMISSION_PAGE_CONTENT'),
     )
 
-    objects = models.Manager()
-
     class Meta:
         verbose_name = _('MODEL_NAME_STATIC_EXERCISE')
         verbose_name_plural = _('MODEL_NAME_STATICE_EXERCISE_PLURAL')
@@ -1298,8 +1302,6 @@ class ExerciseWithAttachment(BaseExercise):
         verbose_name=_('LABEL_ATTACHMENT'),
         upload_to=build_upload_dir,
     )
-
-    objects = models.Manager()
 
     class Meta:
         verbose_name = _('MODEL_NAME_EXERCISE_WITH_ATTACHMENT')

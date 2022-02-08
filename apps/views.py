@@ -12,9 +12,9 @@ class TabView(CourseInstanceBaseView):
     def get_resource_objects(self):
         super().get_resource_objects()
         self.tab_object = get_object_or_404(
-            BaseTab,
+            BaseTab.objects.select_subclasses(),
             id=self._get_kwarg(self.tab_kw),
-        ).as_leaf_class()
+        )
         self.container = self.tab_object.container
 
         if isinstance(self.container, CourseInstance):

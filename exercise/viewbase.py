@@ -107,7 +107,7 @@ class ExerciseMixin(ExerciseRevealRuleMixin, ExerciseBaseMixin, CourseModuleMixi
                 self.module.id,
                 self.kwargs[self.exercise_kw]
             )
-            return LearningObject.objects.get(id=exercise_id).as_leaf_class()
+            return LearningObject.objects.select_subclasses().get(id=exercise_id)
         except (NoSuchContent, LearningObject.DoesNotExist):
             raise Http404("Learning object not found")
 
