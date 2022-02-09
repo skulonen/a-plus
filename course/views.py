@@ -260,10 +260,15 @@ class GroupsView(CourseInstanceMixin, BaseFormView):
     template_name = "course/groups.html"
     form_class = GroupsForm
 
-    def get_common_objects(self):
+    def get_common_objects(self) -> None:
         super().get_common_objects()
         self.enrollment = self.user_course_data
-        self.groups = list(self.profile.groups.filter(course_instance=self.instance))
+        self.groups = list(
+            self.profile.groups.filter(
+                course_instance=self.instance
+            )
+            .prefetch_related('members')
+        )
         self.note('enrollment','groups')
 
     def get_form_kwargs(self):
