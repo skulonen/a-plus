@@ -79,12 +79,12 @@ class CourseCloneTest(CourseTestCase):
                 self._as_names(new_modules[i].learning_objects.all())
             )
             self.assertEqual(
-                self._as_class(old_modules[i].learning_objects.select_subclasses()),
-                self._as_class(new_modules[i].learning_objects.select_subclasses())
+                self._as_class(old_modules[i].learning_objects.all()),
+                self._as_class(new_modules[i].learning_objects.all())
             )
 
-        old_exercise = old_modules[1].learning_objects.select_subclasses().first()
-        new_exercise = new_modules[1].learning_objects.select_subclasses().first()
+        old_exercise = old_modules[1].learning_objects.all().first()
+        new_exercise = new_modules[1].learning_objects.all().first()
         self.assertTrue(old_exercise.submissions.count() > 0)
         self.assertEqual(new_exercise.submissions.count(), 0)
 

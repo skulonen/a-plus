@@ -6,7 +6,7 @@ from model_utils.managers import InheritanceManager
 
 class ModelWithInheritanceManager(InheritanceManager):
     def get_queryset(self):
-        return super().get_queryset().select_related('content_type')
+        return super().get_queryset().select_related('content_type').select_subclasses()
 
 
 class ModelWithInheritance(models.Model):
@@ -24,6 +24,12 @@ class ModelWithInheritance(models.Model):
 
     class Meta:
         abstract = False
+        # This ensures that ModelWithInheritanceManager.get_queryset is ALWAYS
+        # used when fetching instances that inherit from ModelWithInheritance.
+        # Otherwise, related object accesses (e.g. submission.exercise) would
+        # not return subclass instances.
+        # This causes a problem, see the delete method.
+        base_manager_name = 'objects'
 
     def save(self, *args, **kwargs):
         """
@@ -38,15 +44,12 @@ class ModelWithInheritance(models.Model):
 
         super(ModelWithInheritance, self).save(*args, **kwargs)
 
-    def as_leaf_class(self):
-        """
-        Checks if the object is an instance of a certain class or one of its subclasses.
-        If the instance belongs to a subclass, it will be returned as an instance of
-        that class.
-        """
-
-        content_type = self.content_type
-        model_class = content_type.model_class()
-        if (model_class == self.__class__):
-            return self
-        return model_class.objects.get(id=self.id)
+    def delete(self, *args, **kwargs):
+        # We need to override the delete method so that it re-fetches the
+        # object without using InheritanceQueryset. This is because the base
+        # manager has been overridden to call select_subclasses, and because of
+        # that, the parent one-to-one fields no longer work (e.g.
+        # BaseExercise.learningobject_ptr just returns the BaseExercise again).
+        # See also: https://github.com/jazzband/django-model-utils/issues/11
+        base_object = models.QuerySet(ModelWithInheritance).get(id=self.id)
+        return models.Model.delete(base_object, *args, **kwargs)

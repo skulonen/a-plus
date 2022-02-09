@@ -12,7 +12,7 @@ class TabView(CourseInstanceBaseView):
     def get_resource_objects(self):
         super().get_resource_objects()
         self.tab_object = get_object_or_404(
-            BaseTab.objects.select_subclasses(),
+            BaseTab,
             id=self._get_kwarg(self.tab_kw),
         )
         self.container = self.tab_object.container

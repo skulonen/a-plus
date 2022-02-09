@@ -106,7 +106,7 @@ class CachedContent(ContentMixin, CachedAbstract):
             'requirements__threshold__passed_exercises',
             'requirements__threshold__passed_exercises__parent',
             'requirements__threshold__points',
-            Prefetch('learning_objects', LearningObject.objects.select_subclasses()),
+            'learning_objects',
         ):
             entry = {
                 'type': 'module',

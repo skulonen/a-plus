@@ -102,7 +102,7 @@ class CourseSubmissionDataViewSet(NestedViewSetMixin,
             exercise_id__in=ids,
             submitters__in=profiles
         ).prefetch_related(
-            Prefetch('exercise', BaseExercise.objects.select_subclasses()),
+            'exercise',
             'notifications',
             'files',
         )
@@ -123,7 +123,7 @@ class CourseSubmissionDataViewSet(NestedViewSetMixin,
         queryset = Submission.objects.filter(
             id__in=ids
         ).prefetch_related(
-            Prefetch('exercise', BaseExercise.objects.select_subclasses()),
+            'exercise',
             'notifications',
             'files',
         )

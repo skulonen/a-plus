@@ -23,7 +23,6 @@ def clone_learning_objects(
         children = list(
             lobject.children
             .defer(None)
-            .select_subclasses()
         )
 
         # The user can choose to import just chapters or just exercises. If
@@ -160,7 +159,6 @@ def clone(
             objects = list(
                 module.learning_objects.filter(parent__isnull=True)
                 .defer(None)
-                .select_subclasses()
             )
 
             # Save as new module.

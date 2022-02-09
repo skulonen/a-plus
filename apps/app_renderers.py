@@ -72,7 +72,7 @@ def build_plugin_renderers(plugins,
         #else:
         #    raise ValueError(view_name + " is not supported for plugins.")
 
-        plugins = plugins.filter(views__contains=view_name).select_subclasses()
+        plugins = plugins.filter(views__contains=view_name)
 
         renderers = []
         for p in plugins:

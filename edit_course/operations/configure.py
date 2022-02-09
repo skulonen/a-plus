@@ -137,7 +137,7 @@ def configure_learning_objects(
             #course_module__course_instance=module.course_instance,
             course_module=module,
             url=str(o["key"])
-        ).defer(None).select_subclasses().first()
+        ).defer(None).first()
 
         # Select exercise class.
         lobject_cls = (
@@ -641,7 +641,7 @@ def configure_content(instance: CourseInstance, url: str) -> Tuple[bool, List[st
         for module in instance.course_modules.all():
             # cache invalidation uses the parent when learning object is saved:
             # prefetch parent so that it wont be fetched after the it was deleted
-            for lobject in module.learning_objects.all().prefetch_related('parent').select_subclasses():
+            for lobject in module.learning_objects.all().prefetch_related('parent'):
                 if lobject.id not in seen_objects:
                     if (
                         not isinstance(lobject, BaseExercise)

@@ -359,7 +359,7 @@ class Submission(UrlMixin, models.Model):
         """
         # Load the exercise page and parse its contents
         submitters = list(self.submitters.all())
-        page = self.exercise.as_leaf_class().load(
+        page = self.exercise.load(
             request,
             submitters,
             url_name='exercise',
@@ -396,7 +396,7 @@ class Submission(UrlMixin, models.Model):
             user = request.user
         else:
             user = students[0].user if students else None
-        self.exercise.as_leaf_class().modify_post_parameters(
+        self.exercise.modify_post_parameters(
             self._data, self._files, user, students, request, url)
         return (self._data, self._files)
 
@@ -562,7 +562,7 @@ class SubmissionDraft(models.Model):
         else:
             students = [request.user.userprofile]
 
-        page = self.exercise.as_leaf_class().load(
+        page = self.exercise.load(
             request,
             students,
             url_name='exercise',

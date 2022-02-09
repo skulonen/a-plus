@@ -63,8 +63,7 @@ class ExerciseManager(ModelManager):
     name = _('LEARNING_OBJECT')
 
     def get_object(self, instance, object_id):
-        obj = super().get_object(instance, object_id)
-        return obj.as_leaf_class()
+        return super().get_object(instance, object_id)
 
     def new_object(self, instance, parent_id, type):
         CLASSES = {

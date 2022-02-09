@@ -66,19 +66,7 @@ class LearningObjectManager(ModelWithInheritanceManager):
                 'course_module__course_instance__course',
                 'category',
             )
-            .prefetch_related(
-                models.Prefetch(
-                    'parent',
-                    super().get_queryset()
-                    .defer('description')
-                    .select_related(
-                        'course_module',
-                        'course_module__course_instance',
-                        'course_module__course_instance__course',
-                    )
-                )
-            )
-            # Can't select_subclasses here -- it will break deletion at least in Django Admin, because 'objects' is base_manager_name
+            .prefetch_related('parent')
         )
 
     def find_enrollment_exercise(self, course_instance, profile):
@@ -87,11 +75,11 @@ class LearningObjectManager(ModelWithInheritanceManager):
             exercise = self.filter(
                 course_module__course_instance=course_instance,
                 status='enrollment_ext'
-            ).select_subclasses().first()
+            ).first()
         return exercise or self.filter(
             course_module__course_instance=course_instance,
             status='enrollment'
-        ).select_subclasses().first()
+        ).first()
 
 
 class LearningObject(UrlMixin, ModelWithInheritance):
@@ -293,7 +281,7 @@ class LearningObject(UrlMixin, ModelWithInheritance):
         return False
 
     def is_empty(self):
-        return not self.service_url and self.as_leaf_class()._is_empty()
+        return not self.service_url and self._is_empty()
 
     def _is_empty(self):
         return True

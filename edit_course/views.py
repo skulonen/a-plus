@@ -75,9 +75,7 @@ class EditContentView(EditInstanceView):
 
     def get_common_objects(self) -> None:
         self.modules = list(
-            self.instance.course_modules.prefetch_related(
-                models.Prefetch('learning_objects', LearningObject.objects.select_subclasses()),
-            ),
+            self.instance.course_modules.prefetch_related('learning_objects'),
         )
         for module in self.modules:
             learning_objects = {lobject.id: lobject for lobject in module.learning_objects.all()}

@@ -291,7 +291,7 @@ class MenuItem(UrlMixin, models.Model):
                 "instance_slug": self.course_instance.url,
                 "menu_id": self.id,
             }
-            return self.service.as_leaf_class().get_url(replace=self.menu_url, kwargs=kwargs)
+            return self.service.get_url(replace=self.menu_url, kwargs=kwargs)
         if '://' in self.menu_url:
             # Deprecated, but DB can have old urls
             return self.menu_url
@@ -300,7 +300,7 @@ class MenuItem(UrlMixin, models.Model):
     @cached_property
     def final_url(self):
         if self.service:
-            return self.service.as_leaf_class().get_final_url(self.menu_url)
+            return self.service.get_final_url(self.menu_url)
         else:
             return urljoin(self.course_instance.get_absolute_url(), self.menu_url)
 
